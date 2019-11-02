@@ -1,3 +1,5 @@
+[![](https://github.com/balchua/artemis-ext-scaler/workflows/Build%20metrics-provider/badge.svg)](https://github.com/balchua/artemis-ext-scaler/actions)
+
 # Keda External Scaler with ActiveMQ Artemis
 
 This is a demonstration on how to use KEDA's external scaler to monitor [ActiveMQ Artemis](https://activemq.apache.org/components/artemis/) Queue.
