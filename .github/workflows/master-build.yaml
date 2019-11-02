@@ -1,0 +1,97 @@
+name: Build metrics-provider
+
+on:
+  push:
+    branches:
+    - master
+  pull_request:
+    branches:
+    - master
+
+jobs:
+  vm-job:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    
+    - name: set root own
+      run: sudo chown 0:0 /
+
+    - name: Get Skaffold
+      env:
+        KUBECONFIG: /tmp/config
+      run: |
+        curl -Lo skaffold https://storage.googleapis.com/skaffold/releases/latest/skaffold-linux-amd64 && chmod uo+x skaffold && sudo mv skaffold /usr/local/bin
+        skaffold version
+
+    - name: Install snap core
+      run: sudo snap install core
+
+    - name: install microk8s
+      run: sudo snap install microk8s --classic --edge
+
+    - name: Set kubectl alias
+      run: sudo snap alias microk8s.kubectl kubectl
+
+    - name: Enable RBAC addons
+      run: sudo microk8s.enable rbac 
+
+    - name: Enable DNS addons
+      run: |
+        sudo microk8s.enable dns
+        sleep 60 # wait for apiserver to be up and running
+        sudo microk8s.kubectl wait --for=condition=available --timeout=600s deployment/coredns -n kube-system
+
+    - name: Enable storage addons
+      run: |
+        sudo microk8s.enable storage
+        sudo microk8s.kubectl wait --for=condition=available --timeout=600s deployment/hostpath-provisioner -n kube-system
+
+    - name: Enable Helm addon
+      run: |
+        sudo microk8s.enable helm
+
+        cat <<EOF | sudo microk8s.kubectl apply -f -
+        apiVersion: v1
+        kind: ServiceAccount
+        metadata:
+          name: tiller
+          namespace: kube-system
+        ---
+        apiVersion: rbac.authorization.k8s.io/v1
+        kind: ClusterRoleBinding
+        metadata:
+          name: tiller
+        roleRef:
+          apiGroup: rbac.authorization.k8s.io
+          kind: ClusterRole
+          name: cluster-admin
+        subjects:
+          - kind: ServiceAccount
+            name: tiller
+            namespace: kube-system
+        EOF
+
+        sudo microk8s.helm init --service-account tiller
+        sudo microk8s.kubectl wait --for=condition=available --timeout=600s deployment/tiller-deploy -n kube-system
+
+    - name: Verify all pods running
+      run: sudo microk8s.kubectl get pods --all-namespaces
+
+    - name: Build and install ActiveMQ Artemis and metrics-provider
+      env:
+        REGCRED: ${{ secrets.regcred }}
+      run: |
+        echo `pwd`
+        sudo microk8s.kubectl config view --raw > /tmp/config
+        export KUBECONFIG=/tmp/config
+        
+        mkdir -p ~/.docker/
+        echo $REGCRED > ~/.docker/config.json
+        sudo microk8s.kubectl create ns artemis
+        sudo microk8s.kubectl -n artemis create secret generic regcred --from-file ~/.docker/config.json
+        
+        skaffold run -p metrics-provider 
+
+        sudo microk8s.kubectl -n artemis wait --for=condition=available --timeout=600s deployment/artemis-activemq -n artemis
+        sudo microk8s.kubectl -n artemis get pods -o wide

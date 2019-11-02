@@ -1,0 +1,8 @@
+**/target/
+**/.idea/
+**/*.iml
+**/.vscode/
+**/.classpath
+**/.project
+**/.settings/
+**/artemis-ext-scaler

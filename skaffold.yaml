@@ -1,0 +1,58 @@
+apiVersion: skaffold/v1beta15
+kind: Config
+profiles:
+- name: metrics-provider-local
+  build:
+    insecureRegistries: #Use this for local registry.  such as microk8s registry.
+    - 192.168.1.12:32000 
+    artifacts:
+    - image: 192.168.1.12:32000/artemis-ext-scaler
+      context: ./metrics-provider
+      kaniko:
+        dockerfile: Dockerfile
+        buildContext:
+          localDir: {}
+        cache:
+          repo: 192.168.1.12:32000/artemis-ext-scaler   
+    cluster:
+      dockerConfig: 
+        secretName: regcred
+      namespace: artemis
+  deploy:
+    kubectl:
+      manifests:
+      - k8s-manifest/artemis/deployment.yaml
+
+- name: metrics-provider
+  build:
+    artifacts:
+    - image: balchu/artemis-ext-scaler
+      context: ./metrics-provider
+      kaniko:
+        dockerfile: Dockerfile
+        buildContext:
+          localDir: {}
+        cache:
+          repo: balchu/artemis-ext-scaler   
+    cluster:
+      dockerConfig: 
+        secretName: regcred
+      namespace: artemis
+  deploy:
+    kubectl:
+      manifests:
+      - k8s-manifest/artemis/deployment.yaml
+
+- name: consumer
+  build:
+    artifacts:
+    - image: 192.168.1.12:32000/artemis-consumer
+      context: ./consumer
+      jib: {}
+    local:
+      push: true
+      useDockerCLI: false
+  deploy:
+    kubectl:
+      manifests:
+      - k8s-manifest/consumer-deployment.yaml

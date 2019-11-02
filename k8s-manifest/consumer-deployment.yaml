@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: artemis-consumer
+  namespace: artemis
+spec:
+  selector:
+    matchLabels:
+      app: artemis-consumer
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: artemis-consumer
+    spec:
+      containers:
+      - name: artemis-consumer
+        image: 192.168.1.12:32000/artemis-consumer
+        imagePullPolicy: Always
+        env:
+        - name: ARTEMIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: artemis-activemq
+              key: artemis-password
+        - name: ARTEMIS_USERNAME
+          value: "artemis"
+        - name: ARTEMIS_HOST
+          value: "artemis-activemq"
+        - name: ARTEMIS_PORT
+          value: "61616"      
