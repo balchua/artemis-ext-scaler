@@ -1,6 +1,8 @@
 [![](https://github.com/balchua/artemis-ext-scaler/workflows/Build%20metrics-provider/badge.svg)](https://github.com/balchua/artemis-ext-scaler/actions)
 
 # Keda External Scaler with ActiveMQ Artemis
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fbalchua%2Fartemis-ext-scaler.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fbalchua%2Fartemis-ext-scaler?ref=badge_shield)
+
 
 This is a demonstration on how to use KEDA's external scaler to monitor [ActiveMQ Artemis](https://activemq.apache.org/components/artemis/) Queue.
 
@@ -207,3 +209,6 @@ Delete the External Scaler object
 Verify that the HPA is successfully deleted
 
 `kubectl -n artemis get hpa`
+
+## License
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fbalchua%2Fartemis-ext-scaler.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fbalchua%2Fartemis-ext-scaler?ref=badge_large)
