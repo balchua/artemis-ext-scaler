@@ -92,7 +92,7 @@ func (s *externalScalerServer) IsActive(ctx context.Context, in *pb.ScaledObject
 }
 
 func (s *externalScalerServer) GetMetricSpec(ctx context.Context, in *pb.ScaledObjectRef) (*pb.GetMetricSpecResponse, error) {
-	log.Info("Getting Metric Spec")
+	log.Info("Getting Metric Spec...")
 	out := new(pb.GetMetricSpecResponse)
 
 	m := new(pb.MetricSpec)
@@ -112,7 +112,7 @@ func (s *externalScalerServer) getMessageCount() int64 {
 	var monitoringInfo *monitoring
 	messageCount = 0
 
-	log.Info("getting the message count")
+	log.Info("getting the message count..")
 
 	client := &http.Client{
 		Timeout: time.Second * 3,

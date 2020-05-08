@@ -9,11 +9,13 @@ profiles:
     - image: 192.168.1.12:32000/artemis-ext-scaler
       context: ./metrics-provider
       kaniko:
+        image: "gcr.io/kaniko-project/executor:debug-v0.14.0"
         dockerfile: Dockerfile
         buildContext:
           localDir: {}
         cache:
-          repo: 192.168.1.12:32000/artemis-ext-scaler   
+          repo: 192.168.1.12:32000/artemis-ext-scaler 
+          hostPath: /home/thor/data  
     cluster:
       dockerConfig: 
         secretName: regcred
