@@ -35,7 +35,7 @@ jobs:
         sudo usermod -a -G microk8s runner
         sudo chown -f -R runner ~/.kube
         sudo microk8s.kubectl config view --raw > /tmp/config
-        export KUBECONFIG=/tmp/config
+        
 
     - name: install kubectl
       run: sudo snap install kubectl --classic
@@ -47,12 +47,12 @@ jobs:
       run: |
         sudo microk8s.enable dns
         sleep 60 # wait for apiserver to be up and running
-        kubectl wait --for=condition=available --timeout=600s deployment/coredns -n kube-system
+        kubectl wait --kubeconfig /tmp/config --for=condition=available --timeout=600s deployment/coredns -n kube-system
 
     - name: Enable storage addons
       run: |
         sudo microk8s.enable storage
-        kubectl wait --for=condition=available --timeout=600s deployment/hostpath-provisioner -n kube-system
+        kubectl wait --kubeconfig /tmp/config  --for=condition=available --timeout=600s deployment/hostpath-provisioner -n kube-system
 
     - name: Enable Helm addon
       run: |
