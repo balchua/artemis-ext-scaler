@@ -30,6 +30,11 @@ jobs:
     - name: install microk8s
       run: |
         sudo snap install microk8s --classic --edge
+        echo "Show all groups."
+        groups
+        echo "User membership."
+        id runner
+        sudo chmod -R 777 ~/.kube
         sudo usermod -a -G microk8s runner
         sudo chown -f -R runner ~/.kube
 
