@@ -22,7 +22,7 @@ public class App implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
-		for (int i = 0; i < 10000; i++){
+		for (int i = 0; i < 1000; i++){
 			producer.send("Message is: " + System.currentTimeMillis());
 			sleep(10);
 		}
