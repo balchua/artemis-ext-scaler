@@ -1,20 +1,18 @@
-apiVersion: skaffold/v1beta15
+apiVersion: skaffold/v2beta4
 kind: Config
 profiles:
 - name: metrics-provider-local
   build:
     insecureRegistries: #Use this for local registry.  such as microk8s registry.
-    - 192.168.1.12:32000 
+    - 10.0.0.14:32000 
     artifacts:
-    - image: 192.168.1.12:32000/artemis-ext-scaler
+    - image: 10.0.0.14:32000/artemis-ext-scaler
       context: ./metrics-provider
       kaniko:
         image: "gcr.io/kaniko-project/executor:debug-v0.14.0"
         dockerfile: Dockerfile
-        buildContext:
-          localDir: {}
         cache:
-          repo: 192.168.1.12:32000/artemis-ext-scaler 
+          repo: 10.0.0.14:32000/artemis-ext-scaler 
           hostPath: /home/thor/data  
     cluster:
       dockerConfig: 
@@ -32,8 +30,6 @@ profiles:
       context: ./metrics-provider
       kaniko:
         dockerfile: Dockerfile
-        buildContext:
-          localDir: {}
         cache:
           repo: balchu/artemis-ext-scaler   
     cluster:
@@ -48,7 +44,7 @@ profiles:
 - name: consumer
   build:
     artifacts:
-    - image: 192.168.1.12:32000/artemis-consumer
+    - image: balchu/artemis-consumer
       context: ./consumer
       jib: {}
     local:

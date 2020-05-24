@@ -3,10 +3,11 @@ package main
 import (
 	"context"
 	"encoding/json"
-    "flag"
+	"flag"
 	"fmt"
 	"net"
 	"net/http"
+	"os"
 	"strconv"
 	"time"
 
@@ -61,8 +62,9 @@ func getArtemisEndpoint() string {
 
 // NewRequest - Do nothing here
 func (s *externalScalerServer) New(ctx context.Context, newRequest *pb.NewRequest) (*empty.Empty, error) {
+	log.Infof("New() is called.")
 	out := new(empty.Empty)
-	
+
 	size, err := strconv.Atoi(newRequest.Metadata["queueLength"])
 
 	if err != nil {
@@ -70,10 +72,12 @@ func (s *externalScalerServer) New(ctx context.Context, newRequest *pb.NewReques
 	} else {
 		targetSize = size
 	}
-	
+
 	artemisAddress = newRequest.Metadata["brokerAddress"]
 	artemisQueueName = newRequest.Metadata["queueName"]
 	metricName = artemisBrokerName + "-" + artemisAddress + "-" + artemisQueueName
+
+	log.Infof("BrokerAddress: %s, Metrics Name %s, Queue Name: %s", artemisAddress, metricName, artemisQueueName)
 	return out, nil
 }
 
@@ -120,7 +124,9 @@ func (s *externalScalerServer) getMessageCount() int64 {
 	url := getArtemisEndpoint()
 	log.Infof("URL: %s", url)
 	req, err := http.NewRequest("GET", url, nil)
-	req.SetBasicAuth("artemis", "artemis")
+
+	req.SetBasicAuth(userName, password)
+
 	if err != nil {
 		log.Errorf("Error while accessing ActiveMQ: %s", err)
 		return 0
@@ -136,6 +142,8 @@ func (s *externalScalerServer) getMessageCount() int64 {
 	json.NewDecoder(resp.Body).Decode(&monitoringInfo)
 	if resp.StatusCode == 200 && monitoringInfo.Status == 200 {
 		messageCount = monitoringInfo.MsgCount
+	} else {
+		log.Infof("Response Status %d", resp.StatusCode)
 	}
 	log.Infof("Total messages: %d", messageCount)
 	return messageCount
@@ -171,9 +179,14 @@ func main() {
 	flag.StringVar(&password, "password", "artemis", "The artemis broker address")
 
 	flag.Parse()
-
+	if password == "" {
+		log.Fatalf("Invalid credential.")
+		os.Exit(1)
+	}
 	fmt.Printf("Port: %d\n", port)
 	fmt.Printf("URL: %s\n", artemisURL)
+	fmt.Printf("User %s\n", userName)
+
 	lis, err := net.Listen("tcp", fmt.Sprintf("0.0.0.0:%d", 5050))
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)

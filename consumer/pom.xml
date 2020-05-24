@@ -18,7 +18,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<java.version>11</java.version>
-         <jib-version>1.4.0</jib-version>
+        <jib-version>2.2.0</jib-version>
 	</properties>
 
 	<dependencies>
@@ -96,13 +96,13 @@
                         <image>adoptopenjdk/openjdk11:jdk-11.0.3_7-debian-slim</image>
                     </from>
                     <container>
-                        <useCurrentTimestamp>true</useCurrentTimestamp>
+                         <creationTime>USE_CURRENT_TIMESTAMP</creationTime>
                         <jvmFlags>
                             <jvmFlag>-Djava.security.egd=file:/dev/./urandom</jvmFlag>
                         </jvmFlags>
                     </container>
                     <to>
-                        <image>192.168.1.12:32000/${project.artifactId}:${project.version}</image>
+                        <image>${project.artifactId}:${project.version}</image>
                     </to>
                 </configuration>
             </plugin>
