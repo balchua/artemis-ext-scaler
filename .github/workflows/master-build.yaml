@@ -28,7 +28,10 @@ jobs:
       run: sudo snap install core
 
     - name: install microk8s
-      run: sudo snap install microk8s --classic --edge
+      run: |
+        sudo snap install microk8s --classic --edge
+        sudo usermod -a -G microk8s runner
+        sudo chown -f -R runner ~/.kube
 
     - name: Set kubectl alias
       run: sudo snap alias microk8s.kubectl kubectl
@@ -40,7 +43,7 @@ jobs:
       run: |
         sudo microk8s.enable dns
         sleep 60 # wait for apiserver to be up and running
-        sudo microk8s.kubectl wait --for=condition=available --timeout=600s deployment/coredns -n kube-system
+        kubectl wait --for=condition=available --timeout=600s deployment/coredns -n kube-system
 
     - name: Enable storage addons
       run: |
@@ -73,7 +76,7 @@ jobs:
         EOF
 
         sudo microk8s.helm init --service-account tiller
-        sudo microk8s.kubectl wait --for=condition=available --timeout=600s deployment/tiller-deploy -n kube-system
+        kubectl wait --for=condition=available --timeout=600s deployment/tiller-deploy -n kube-system
 
     - name: Verify all pods running
       run: sudo microk8s.kubectl get pods --all-namespaces
@@ -83,18 +86,16 @@ jobs:
         REGCRED: ${{ secrets.regcred }}
       run: |
         echo `pwd`
-        sudo usermod -a -G microk8s runner
-        sudo chown -f -R runner ~/.kube
 
-        sudo microk8s.kubectl config view --raw > /tmp/config
+        kubectl config view --raw > /tmp/config
         export KUBECONFIG=/tmp/config
         
         mkdir -p ~/.docker/
         echo $REGCRED > ~/.docker/config.json
-        sudo microk8s.kubectl create ns artemis
-        sudo microk8s.kubectl -n artemis create secret generic regcred --from-file ~/.docker/config.json
+        kubectl create ns artemis
+        kubectl -n artemis create secret generic regcred --from-file ~/.docker/config.json
         
-        sudo skaffold run -p metrics-provider 
+        skaffold run -p metrics-provider 
 
-        sudo microk8s.kubectl -n artemis wait --for=condition=available --timeout=600s deployment/artemis-activemq -n artemis
-        sudo microk8s.kubectl -n artemis get pods -o wide
+        kubectl -n artemis wait --for=condition=available --timeout=600s deployment/artemis-activemq -n artemis
+        kubectl -n artemis get pods -o wide
