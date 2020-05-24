@@ -80,17 +80,17 @@ jobs:
         EOF
 
         sudo microk8s.helm init --service-account tiller
-        kubectl wait --for=condition=available --timeout=600s deployment/tiller-deploy -n kube-system
+        kubectl wait --kubeconfig /tmp/config --for=condition=available --timeout=600s deployment/tiller-deploy -n kube-system
 
     - name: Verify all pods running
-      run: kubectl get pods --all-namespaces
+      run: kubectl --kubeconfig /tmp/config get pods --all-namespaces
 
     - name: Build and install ActiveMQ Artemis and metrics-provider
       env:
         REGCRED: ${{ secrets.regcred }}
       run: |
         echo `pwd`
-        
+        export KUBECONFIG=/tmp/config
         mkdir -p ~/.docker/
         echo $REGCRED > ~/.docker/config.json
         kubectl create ns artemis
