@@ -48,13 +48,13 @@ jobs:
     - name: Enable storage addons
       run: |
         sudo microk8s.enable storage
-        sudo microk8s.kubectl wait --for=condition=available --timeout=600s deployment/hostpath-provisioner -n kube-system
+        kubectl wait --for=condition=available --timeout=600s deployment/hostpath-provisioner -n kube-system
 
     - name: Enable Helm addon
       run: |
         sudo microk8s.enable helm
 
-        cat <<EOF | sudo microk8s.kubectl apply -f -
+        cat <<EOF | sudo kubectl apply -f -
         apiVersion: v1
         kind: ServiceAccount
         metadata:
@@ -79,7 +79,7 @@ jobs:
         kubectl wait --for=condition=available --timeout=600s deployment/tiller-deploy -n kube-system
 
     - name: Verify all pods running
-      run: sudo microk8s.kubectl get pods --all-namespaces
+      run: kubectl get pods --all-namespaces
 
     - name: Build and install ActiveMQ Artemis and metrics-provider
       env:
