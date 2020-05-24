@@ -30,17 +30,15 @@ jobs:
     - name: install microk8s
       run: |
         sudo snap install microk8s --classic --edge
-        echo "Show all groups."
-        groups
-        echo "User membership."
-        id runner
         mkdir ~/.kube
         sudo chmod -R 777 ~/.kube
         sudo usermod -a -G microk8s runner
         sudo chown -f -R runner ~/.kube
+        sudo microk8s.kubectl config view --raw > /tmp/config
+        export KUBECONFIG=/tmp/config
 
-    - name: Set kubectl alias
-      run: sudo snap alias microk8s.kubectl kubectl
+    - name: install kubectl
+      run: sudo snap install kubectl --classic
 
     - name: Enable RBAC addons
       run: sudo microk8s.enable rbac 
@@ -92,9 +90,6 @@ jobs:
         REGCRED: ${{ secrets.regcred }}
       run: |
         echo `pwd`
-
-        kubectl config view --raw > /tmp/config
-        export KUBECONFIG=/tmp/config
         
         mkdir -p ~/.docker/
         echo $REGCRED > ~/.docker/config.json
