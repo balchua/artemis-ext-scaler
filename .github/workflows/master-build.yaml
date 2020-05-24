@@ -56,31 +56,7 @@ jobs:
 
     - name: Enable Helm addon
       run: |
-        sudo microk8s.enable helm
-
-        cat <<EOF | sudo kubectl apply -f -
-        apiVersion: v1
-        kind: ServiceAccount
-        metadata:
-          name: tiller
-          namespace: kube-system
-        ---
-        apiVersion: rbac.authorization.k8s.io/v1
-        kind: ClusterRoleBinding
-        metadata:
-          name: tiller
-        roleRef:
-          apiGroup: rbac.authorization.k8s.io
-          kind: ClusterRole
-          name: cluster-admin
-        subjects:
-          - kind: ServiceAccount
-            name: tiller
-            namespace: kube-system
-        EOF
-
-        sudo microk8s.helm init --service-account tiller
-        kubectl wait --kubeconfig /tmp/config --for=condition=available --timeout=600s deployment/tiller-deploy -n kube-system
+        sudo microk8s.enable helm3
 
     - name: Verify all pods running
       run: kubectl --kubeconfig /tmp/config get pods --all-namespaces
