@@ -83,6 +83,9 @@ jobs:
         REGCRED: ${{ secrets.regcred }}
       run: |
         echo `pwd`
+        sudo usermod -a -G microk8s runner
+        sudo chown -f -R runner ~/.kube
+        
         sudo microk8s.kubectl config view --raw > /tmp/config
         export KUBECONFIG=/tmp/config
         
