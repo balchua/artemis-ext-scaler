@@ -85,7 +85,7 @@ jobs:
         echo `pwd`
         sudo usermod -a -G microk8s runner
         sudo chown -f -R runner ~/.kube
-        
+
         sudo microk8s.kubectl config view --raw > /tmp/config
         export KUBECONFIG=/tmp/config
         
@@ -94,7 +94,7 @@ jobs:
         sudo microk8s.kubectl create ns artemis
         sudo microk8s.kubectl -n artemis create secret generic regcred --from-file ~/.docker/config.json
         
-        skaffold run -p metrics-provider 
+        sudo skaffold run -p metrics-provider 
 
         sudo microk8s.kubectl -n artemis wait --for=condition=available --timeout=600s deployment/artemis-activemq -n artemis
         sudo microk8s.kubectl -n artemis get pods -o wide
