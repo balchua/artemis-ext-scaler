@@ -34,6 +34,7 @@ jobs:
         groups
         echo "User membership."
         id runner
+        mkdir ~/.kube
         sudo chmod -R 777 ~/.kube
         sudo usermod -a -G microk8s runner
         sudo chown -f -R runner ~/.kube
