@@ -1,4 +1,7 @@
 # Keda External Scaler with ActiveMQ Artemis
+
+***This sample has been updated to use KEDA v2 and ActiveMQ Artemis 2.15.0***
+
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fbalchua%2Fartemis-ext-scaler.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fbalchua%2Fartemis-ext-scaler?ref=badge_shield)
 [![](https://github.com/balchua/artemis-ext-scaler/workflows/Build%20metrics-provider/badge.svg)](https://github.com/balchua/artemis-ext-scaler/actions)
 
