@@ -16,7 +16,7 @@ jobs:
     
     - uses: balchua/microk8s-actions@v0.1.3
       with:
-        channel: '1.19/candidate'
+        channel: '1.18/stable'
         rbac: 'true'
         dns: 'true'
         storage: 'true'
@@ -43,7 +43,7 @@ jobs:
         
         sudo microk8s status --wait-ready
 
-        skaffold -v trace run -p metrics-provider 
+        skaffold -v trace --cache-artifacts=false run -p metrics-provider 
 
         kubectl -n artemis wait --for=condition=available --timeout=600s deployment/artemis-activemq -n artemis
         kubectl -n artemis get pods -o wide
