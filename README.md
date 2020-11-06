@@ -82,20 +82,18 @@ Now its time to setup the KEDA's external scaler.
 The file looks like this.
 
 ```yaml
-apiVersion: keda.k8s.io/v1alpha1
+apiVersion: keda.sh/v1alpha1
 kind: ScaledObject
 metadata:
   name: artemis-scaledobject
   namespace: artemis
-  labels:
-    deploymentName: artemis-consumer
 spec:
-  pollingInterval: 10   # Optional. Default: 30 seconds
-  cooldownPeriod: 100  # Optional. Default: 300 seconds
+  pollingInterval: 5   # Optional. Default: 30 seconds
+  cooldownPeriod: 5  # Optional. Default: 300 seconds
   minReplicaCount: 0   # Optional. Default: 0
   maxReplicaCount: 30  # Optional. Default: 100  
   scaleTargetRef:
-    deploymentName: artemis-consumer
+    name: artemis-consumer
   triggers:
   - type: external
     metadata:
