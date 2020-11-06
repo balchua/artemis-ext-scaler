@@ -9,7 +9,7 @@ on:
     - master
 
 jobs:
-  vm-job:
+  build-external-scaler:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
