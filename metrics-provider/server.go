@@ -60,12 +60,11 @@ func getArtemisEndpoint() string {
 		artemisQueueName + "\"" + "/MessageCount"
 }
 
-// NewRequest - Do nothing here
-func (s *externalScalerServer) New(ctx context.Context, newRequest *pb.NewRequest) (*empty.Empty, error) {
-	log.Infof("New() is called.")
+func (s *externalScalerServer) setBrokerDetails(scaledObject *pb.ScaledObjectRef) (*empty.Empty, error) {
+	log.Infof("broker details is called.")
 	out := new(empty.Empty)
 
-	size, err := strconv.Atoi(newRequest.Metadata["queueLength"])
+	size, err := strconv.Atoi(scaledObject.ScalerMetadata["queueLength"])
 
 	if err != nil {
 		targetSize = 10
@@ -73,8 +72,8 @@ func (s *externalScalerServer) New(ctx context.Context, newRequest *pb.NewReques
 		targetSize = size
 	}
 
-	artemisAddress = newRequest.Metadata["brokerAddress"]
-	artemisQueueName = newRequest.Metadata["queueName"]
+	artemisAddress = scaledObject.ScalerMetadata["brokerAddress"]
+	artemisQueueName = scaledObject.ScalerMetadata["queueName"]
 	metricName = artemisBrokerName + "-" + artemisAddress + "-" + artemisQueueName
 
 	log.Infof("BrokerAddress: %s, Metrics Name %s, Queue Name: %s", artemisAddress, metricName, artemisQueueName)
@@ -97,6 +96,7 @@ func (s *externalScalerServer) IsActive(ctx context.Context, in *pb.ScaledObject
 
 func (s *externalScalerServer) GetMetricSpec(ctx context.Context, in *pb.ScaledObjectRef) (*pb.GetMetricSpecResponse, error) {
 	log.Info("Getting Metric Spec...")
+	s.setBrokerDetails(in)
 	out := new(pb.GetMetricSpecResponse)
 
 	m := new(pb.MetricSpec)
@@ -126,6 +126,7 @@ func (s *externalScalerServer) getMessageCount() int64 {
 	req, err := http.NewRequest("GET", url, nil)
 
 	req.SetBasicAuth(userName, password)
+	req.Header.Add("Origin", "localhost")
 
 	if err != nil {
 		log.Errorf("Error while accessing ActiveMQ: %s", err)
@@ -145,12 +146,18 @@ func (s *externalScalerServer) getMessageCount() int64 {
 	} else {
 		log.Infof("Response Status %d", resp.StatusCode)
 	}
+	log.Infof("Request: %s", monitoringInfo.Request)
 	log.Infof("Total messages: %d", messageCount)
 	return messageCount
 }
 
-func (s *externalScalerServer) GetMetrics(ctx context.Context, in *pb.GetMetricsRequest) (*pb.GetMetricsResponse, error) {
+func (s *externalScalerServer) StreamIsActive(in *pb.ScaledObjectRef, stream pb.ExternalScaler_StreamIsActiveServer) error {
+	log.Infof("Stream is active is called.")
 
+	return nil
+}
+
+func (s *externalScalerServer) GetMetrics(ctx context.Context, in *pb.GetMetricsRequest) (*pb.GetMetricsResponse, error) {
 	messageCount := s.getMessageCount()
 
 	m := new(pb.MetricValue)

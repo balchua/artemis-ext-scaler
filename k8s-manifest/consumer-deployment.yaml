@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: artemis-consumer
-        image: balchu/artemis-consumer
+        image: balchu/artemis-consumer:d83d80b
         imagePullPolicy: Always
         env:
         - name: ARTEMIS_PASSWORD

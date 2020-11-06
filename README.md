@@ -1,5 +1,3 @@
-
-
 # Keda External Scaler with ActiveMQ Artemis
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fbalchua%2Fartemis-ext-scaler.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fbalchua%2Fartemis-ext-scaler?ref=badge_shield)
 [![](https://github.com/balchua/artemis-ext-scaler/workflows/Build%20metrics-provider/badge.svg)](https://github.com/balchua/artemis-ext-scaler/actions)
@@ -7,6 +5,8 @@
 This is a demonstration on how to use KEDA's external scaler to monitor [ActiveMQ Artemis](https://activemq.apache.org/components/artemis/) Queue.
 
 The Keda external scaler calls metrics-provider GRPC server which will collect the metrics from ActiveMQ Artemis.
+
+***ActiveMQ Artemis is now included as part of the KEDA internal scaler***
 
 **Note: use your own docker repository while building the project.**
 

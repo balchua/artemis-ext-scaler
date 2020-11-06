@@ -100,7 +100,7 @@ spec:
           mountPath: /data/etc-override/
       containers:
       - name: artemis-activemq-metrics-provider
-        image: balchu/artemis-ext-scaler:5cee98e-dirty
+        image: balchu/artemis-ext-scaler:d83d80b-dirty
         args: ["--port","5050","--broker","$(POD_NAME)","--user", "$(ARTEMIS_USERNAME)","--password","$(ARTEMIS_PASSWORD)"]
         imagePullPolicy: Always
         resources:
