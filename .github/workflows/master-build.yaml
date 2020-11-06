@@ -14,7 +14,7 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     
-    - uses: balchua/microk8s-actions@release/v0.1.3
+    - uses: balchua/microk8s-actions@v0.1.3
       with:
         channel: '1.19/candidate'
         rbac: 'true'
