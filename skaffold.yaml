@@ -1,28 +1,27 @@
-apiVersion: skaffold/v2beta4
+apiVersion: skaffold/v2beta9
 kind: Config
 profiles:
 - name: metrics-provider-local
   build:
-    insecureRegistries: #Use this for local registry.  such as microk8s registry.
-    - 10.0.0.14:32000 
     artifacts:
-    - image: 10.0.0.14:32000/artemis-ext-scaler
+    - image: registry.container-registry:5000/artemis-ext-scaler
       context: ./metrics-provider
       kaniko:
-        image: "gcr.io/kaniko-project/executor:debug-v0.14.0"
         dockerfile: Dockerfile
+        image: gcr.io/kaniko-project/executor:debug-v1.3.0
         cache:
-          repo: 10.0.0.14:32000/artemis-ext-scaler 
-          hostPath: /home/thor/data  
+          repo: registry.container-registry:5000/artemis-ext-scaler
+          hostPath: /home/thor/data
+    insecureRegistries:
+    - registry.container-registry:5000
     cluster:
-      dockerConfig: 
-        secretName: regcred
       namespace: artemis
+      dockerConfig:
+        secretName: regcred
   deploy:
     kubectl:
       manifests:
       - k8s-manifest/artemis/deployment.yaml
-
 - name: metrics-provider
   build:
     artifacts:
@@ -31,16 +30,15 @@ profiles:
       kaniko:
         dockerfile: Dockerfile
         cache:
-          repo: balchu/artemis-ext-scaler   
+          repo: balchu/artemis-ext-scaler
     cluster:
-      dockerConfig: 
-        secretName: regcred
       namespace: artemis
+      dockerConfig:
+        secretName: regcred
   deploy:
     kubectl:
       manifests:
       - k8s-manifest/artemis/deployment.yaml
-
 - name: consumer
   build:
     artifacts:
@@ -49,7 +47,6 @@ profiles:
       jib: {}
     local:
       push: true
-      useDockerCLI: false
   deploy:
     kubectl:
       manifests:

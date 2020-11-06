@@ -91,7 +91,7 @@ spec:
     spec:
       initContainers:
       - name: configure-cluster
-        image: docker.io/vromero/activemq-artemis:2.6.2
+        image: docker.io/vromero/activemq-artemis:2.15.0
         command: ["/bin/sh", "/data/etc-override/configure-cluster.sh"]
         volumeMounts:
         - name: config-override
@@ -100,7 +100,7 @@ spec:
           mountPath: /data/etc-override/
       containers:
       - name: artemis-activemq-metrics-provider
-        image: balchu/artemis-ext-scaler
+        image: balchu/artemis-ext-scaler:5cee98e-dirty
         args: ["--port","5050","--broker","$(POD_NAME)","--user", "$(ARTEMIS_USERNAME)","--password","$(ARTEMIS_PASSWORD)"]
         imagePullPolicy: Always
         resources:
@@ -124,7 +124,7 @@ spec:
           containerPort: 5050
 
       - name: artemis-activemq-artemis
-        image: docker.io/vromero/activemq-artemis:2.6.2
+        image: docker.io/vromero/activemq-artemis:2.15.0
         imagePullPolicy: 
         resources:
           requests:
