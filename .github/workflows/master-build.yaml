@@ -14,8 +14,12 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     
-    - name: set root own
-      run: sudo chown 0:0 /
+    - uses: balchua/microk8s-actions@release/v0.1.3
+      with:
+        channel: '1.19/candidate'
+        rbac: 'true'
+        dns: 'true'
+        storage: 'true'
 
     - name: Get Skaffold
       env:
@@ -24,49 +28,14 @@ jobs:
         curl -Lo skaffold https://storage.googleapis.com/skaffold/releases/latest/skaffold-linux-amd64 && chmod uo+x skaffold && sudo mv skaffold /usr/local/bin
         skaffold version
 
-    - name: Install snap core
-      run: sudo snap install core
-
-    - name: install microk8s
-      run: |
-        sudo snap install microk8s --classic --edge
-        mkdir ~/.kube
-        sudo chmod -R 777 ~/.kube
-        sudo usermod -a -G microk8s runner
-        sudo chown -f -R runner ~/.kube
-        sudo microk8s.kubectl config view --raw > /tmp/config
-        
-
-    - name: install kubectl
-      run: sudo snap install kubectl --classic
-
-    - name: Enable RBAC addons
-      run: sudo microk8s.enable rbac 
-
-    - name: Enable DNS addons
-      run: |
-        sudo microk8s.enable dns
-        sleep 60 # wait for apiserver to be up and running
-        kubectl wait --kubeconfig /tmp/config --for=condition=available --timeout=600s deployment/coredns -n kube-system
-
-    - name: Enable storage addons
-      run: |
-        sudo microk8s.enable storage
-        kubectl wait --kubeconfig /tmp/config  --for=condition=available --timeout=600s deployment/hostpath-provisioner -n kube-system
-
     - name: Enable Helm addon
       run: |
         sudo microk8s.enable helm3
-
-    - name: Verify all pods running
-      run: kubectl --kubeconfig /tmp/config get pods --all-namespaces
 
     - name: Build and install ActiveMQ Artemis and metrics-provider
       env:
         REGCRED: ${{ secrets.regcred }}
       run: |
-        echo `pwd`
-        export KUBECONFIG=/tmp/config
         mkdir -p ~/.docker/
         echo $REGCRED > ~/.docker/config.json
         kubectl create ns artemis

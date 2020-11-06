@@ -31,10 +31,12 @@ var (
 )
 
 type monitoring struct {
-	Request   string `json:"request"`
-	MsgCount  int64  `json:"value"`
-	Status    int    `json:"status"`
-	Timestamp int64  `json:"timestamp"`
+	Request      string `json:"request"`
+	MsgCount     int64  `json:"value"`
+	Status       int    `json:"status"`
+	Timestamp    int64  `json:"timestamp"`
+	ErrorType    string `json:"error_type`
+	ErrorMessage string `json:"error"`
 }
 
 type requestInfo struct {
@@ -144,9 +146,13 @@ func (s *externalScalerServer) getMessageCount() int64 {
 	if resp.StatusCode == 200 && monitoringInfo.Status == 200 {
 		messageCount = monitoringInfo.MsgCount
 	} else {
-		log.Infof("Response Status %d", resp.StatusCode)
+		log.Errorf("Http Response Status: %d, Artemis response status: %d, Artemis response error message: %s, error type: %s",
+			resp.StatusCode,
+			monitoringInfo.Status,
+			monitoringInfo.ErrorMessage,
+			monitoringInfo.ErrorType)
 	}
-	log.Infof("Request: %s", monitoringInfo.Request)
+
 	log.Infof("Total messages: %d", messageCount)
 	return messageCount
 }
