@@ -17,9 +17,7 @@ jobs:
     - uses: balchua/microk8s-actions@v0.2.1
       with:
         channel: '1.19/candidate'
-        rbac: 'true'
-        dns: 'true'
-        storage: 'true'
+        addons: "['rbac','dns','storage']"
 
     - name: Get Skaffold
       env:
